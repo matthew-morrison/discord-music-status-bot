@@ -8,7 +8,6 @@ import asyncio
 
 bot = commands.Bot(command_prefix='~', description="librarian", pm_help=None, self_bot=True)
 
-
 configFile = "config.json"
 if os.path.isfile("config.json"):
     file = open("config.json")
@@ -18,8 +17,9 @@ else:
     print("no config found... exploding now...")
  
 async def looptons():
+    alreadyplaying = ""
     while True:
-        await updateSong()
+        alreadyplaying = await updateSong(alreadyplaying)
         await asyncio.sleep(3)
     
 @bot.event
@@ -31,7 +31,7 @@ async def on_ready():
     main_loop = asyncio.get_event_loop()
     main_loop.create_task(looptons())
     
-async def updateSong():
+async def updateSong(alreadyplaying):
     try:
         s = requests.Session()
         s.auth = ('','1234') #shhh I know it's insecure
@@ -54,10 +54,13 @@ async def updateSong():
             song = s.contents[0]
             
     nowplaying = artist + ": "+song        
-    print(nowplaying)
-    await bot.change_presence(game = discord.Game(name=nowplaying))
     
-    
+    if nowplaying != alreadyplaying: #keep the requests to discord server down
+        alreadyplaying = nowplaying
+        await bot.change_presence(game = discord.Game(name=nowplaying))
+        print(nowplaying)
+        print("switched songs")
+    return alreadyplaying
 @bot.event
 async def on_message(message):   
     await bot.process_commands(message) # to the superclass ???
