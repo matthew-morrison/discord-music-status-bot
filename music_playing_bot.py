@@ -57,7 +57,7 @@ async def updateSong(alreadyplaying):
     
     if nowplaying != alreadyplaying: #keep the requests to discord server down
         alreadyplaying = nowplaying
-        await bot.change_presence(game = discord.Game(name=nowplaying))
+        await bot.change_presence(game = discord.Game(name=nowplaying, type=0), status=None, afk=False)
         print(nowplaying)
         print("switched songs")
     return alreadyplaying
