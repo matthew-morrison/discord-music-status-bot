@@ -5,6 +5,12 @@ import os, time, datetime, requests, codecs
 import urllib.parse
 from bs4 import BeautifulSoup
 import asyncio
+import sys
+
+"""
+Discord userbot which updates your current game playing with your current music playing from VLC.
+
+"""
 
 bot = commands.Bot(command_prefix='~', description="librarian", pm_help=None, self_bot=True)
 
@@ -16,6 +22,7 @@ if os.path.isfile("config.json"):
 else:
     print("no config found... exploding now...")
  
+#main async loop 
 async def looptons():
     alreadyplaying = ""
     while True:
@@ -29,10 +36,10 @@ async def on_ready():
     print(bot.user.id)
     print('------')
     main_loop = asyncio.get_event_loop()
-    main_loop.create_task(looptons())
+    main_loop.create_task(looptons()) #start main async loop
     
 async def updateSong(alreadyplaying):
-    try:
+    try: #connect to vlc
         s = requests.Session()
         s.auth = ('','1234') #shhh I know it's insecure
         r = s.get('http://localhost:8080/requests/status.xml', verify=False)
@@ -58,6 +65,7 @@ async def updateSong(alreadyplaying):
     if nowplaying != alreadyplaying: #keep the requests to discord server down
         alreadyplaying = nowplaying
         await bot.change_presence(game = discord.Game(name=nowplaying, type=0), status=None, afk=False)
+        sys.stdout.write("\x1b];"+nowplaying+"\x07") #write song to terminal title
         print(nowplaying)
         print("switched songs")
     return alreadyplaying
