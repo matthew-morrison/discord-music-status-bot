@@ -6,6 +6,7 @@ import urllib.parse
 from bs4 import BeautifulSoup
 import asyncio
 import sys
+import html
 
 """
 Discord userbot which updates your current game playing with your current music playing from VLC.
@@ -60,7 +61,7 @@ async def updateSong(alreadyplaying):
         if s.attrs['name'] == 'title':
             song = s.contents[0]
             
-    nowplaying = artist + ": "+song        
+    nowplaying = html.unescape(artist + ": "+song) #from web xml so can be escaped
     
     if nowplaying != alreadyplaying: #keep the requests to discord server down
         alreadyplaying = nowplaying
@@ -69,6 +70,7 @@ async def updateSong(alreadyplaying):
         print(nowplaying)
         print("switched songs")
     return alreadyplaying
+    
 @bot.event
 async def on_message(message):   
     await bot.process_commands(message) # to the superclass ???
