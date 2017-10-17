@@ -28,7 +28,7 @@ async def looptons():
     alreadyplaying = ""
     while True:
         alreadyplaying = await updateSong(alreadyplaying)
-        await asyncio.sleep(3)
+        await asyncio.sleep(5)
     
 @bot.event
 async def on_ready():
@@ -54,14 +54,18 @@ async def updateSong(alreadyplaying):
     song = ""
     soup = BeautifulSoup(r.content, 'lxml')
     #print(soup.information)
+    playing = soup.state.text == 'playing' # bool flag
     infos = soup.find_all("info")
     for s in infos:
         if s.attrs['name'] == 'artist':
             artist = s.contents[0]
         if s.attrs['name'] == 'title':
             song = s.contents[0]
-            
-    nowplaying = html.unescape(artist + ": "+song) #from web xml so can be escaped
+    
+    if playing:        
+        nowplaying = html.unescape(artist + ": "+song) #from web xml so can be escaped
+    else:
+        nowplaying = 'something other than music'
     
     if nowplaying != alreadyplaying: #keep the requests to discord server down
         alreadyplaying = nowplaying
